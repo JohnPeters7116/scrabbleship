@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Board from './board';
 
-export default class App extends Component {
+class App extends Component {
   constructor(props){
     super(props)
   }
@@ -21,8 +21,11 @@ export default class App extends Component {
   render() {
     return (
       <div>
+        <h1>ScrabbleShip</h1>
         <Board/>
       </div>
     );
   }
 }
+
+export default App;

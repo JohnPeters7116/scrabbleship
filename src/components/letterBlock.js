@@ -43,47 +43,49 @@ export default class LetterBlock extends Component {
   render() {
     const { connectDragSource, isDragging, letter } = this.props;
     return connectDragSource(
-      <div style={{
-        display: 'flex',
-        width: '100%',
-        height: '100%',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'column'
-        }}>
-        <div style={{
-          width: 30,
-          height: 30,
-          opacity: isDragging ? 0.5 : 1,
-          position: 'relative',
-          display: 'inline-block',
-          background: '#e4d095',
-          color: '#2a1f1b',
-          borderRadius: 4,
-          fontWeight: 400,
-          fontSize: 16,
-          textAlign: 'center',
-          cursor: 'default',
-          textShadow: '1px 1px 1px rgba(255, 255, 255, 0.9), 0 -1px 1px rgba(255,255,255,0.2)',
-          textTransform: 'uppercase',
-          boxShadow: '1px 7px 15px rgba(0,0,0,0.8), inset 3px 0 2px rgba(255,255,255,0.4), inset 0 3px 0px rgba(255,255,255,0.5), inset -2px -3px 0px rgba(143,128,82,0.6)',
-
-        }}>
-          {letter.char}
-        </div>
-      <div style={{
-                      // position: 'absolute',
-                      // bottom: 3,
-                      // right: 3,
-                      fontSize: 8,
-                      fontWeight: 'bold',
-                      textAlign: 'center',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                      {letter.v}
-                    </div>
+    <div style={styles.letterContainer}>
+      <div style={styles.letter}>
+        {letter.char}
+      </div>
+      <div style={styles.number}>
+        {letter.v}
+      </div>
     </div>
     );
+  }
+}
+
+const styles = {
+  letterContainer: {
+    display: 'flex',
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    position: 'relative',
+    display: 'inline-block',
+    borderRadius: 4,
+    background: '#e4d095',
+    cursor: 'default',
+    textShadow: '1px 1px 1px rgba(255, 255, 255, 0.9), 0 -1px 1px rgba(255,255,255,0.2)',
+    textTransform: 'uppercase',
+    boxShadow: '1px 7px 15px rgba(0,0,0,0.8), inset 3px 0 2px rgba(255,255,255,0.4), inset 0 3px 0px rgba(255,255,255,0.5), inset -2px -3px 0px rgba(143,128,82,0.6)',
+    width: 30,
+    height: 30,
+  },
+  letter: {
+    color: '#2a1f1b',
+    fontWeight: 400,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  number: {
+    position: 'absolute',
+    color: '#2a1f1b',
+    right: 5,
+    bottom: 5,
+    fontSize: 8,
+    fontWeight: 'bold',
   }
 }

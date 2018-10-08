@@ -55,13 +55,7 @@ export default class BoardSquare extends Component {
     // console.log("TARGET", dropResult)
 
     return connectDropTarget(
-      <div style={{
-        position: 'relative',
-        width: '100%',
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
+      <div style={styles.container}>
         <Square black={black} holder={holder} coordinates={[x, y]}>
           {this.props.children}
         </Square>
@@ -72,3 +66,13 @@ export default class BoardSquare extends Component {
     );
   }
 }
+
+const styles = {
+  container: {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+};

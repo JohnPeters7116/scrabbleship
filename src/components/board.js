@@ -83,25 +83,11 @@ class Board extends Component {
   render() {
     const { usersLetters} = this.props
     return (
-      <div>
-        <div style={{
-          width: 500,
-          height: 500,
-          display: 'flex',
-          flexWrap: 'wrap'
-        }}>
+      <div style={styles.container}>
+        <div style={styles.boardContainer}>
           {this.renderBoard()}
         </div>
-          <div style={{
-          width: 500,
-          height: 50,
-          marginTop: 25,
-          justifyContent: 'center',
-          alignItems: 'center',
-          display: 'flex',
-          flexWrap: 'wrap',
-          backgroundColor: 'brown'
-        }}>
+          <div style={styles.holderContainer}>
           {this.renderHolderSquares()}
         </div>
         <div onClick={() => this.newGame()}>
@@ -109,7 +95,6 @@ class Board extends Component {
         </div>
         <div onClick={async() => {
           const isWord = await composeWord(this.props.usersLetters)
-          console.log('test', isWord)
           this.setState({ isWord })
         }}>
           Submit Word
@@ -137,3 +122,30 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect (mapStateToProps, mapDispatchToProps)(Board)
+
+const styles = {
+  container: {
+    display: 'flex',
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+    flex: 1,
+  },
+  boardContainer: {
+    margin: 25,
+    width: 500,
+    height: 500,
+    display: 'flex',
+    flexWrap: 'wrap'
+  },
+  holderContainer: {
+    width: 500,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    display: 'flex',
+    flexWrap: 'wrap',
+    backgroundColor: 'brown'
+  }
+};
