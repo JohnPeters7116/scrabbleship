@@ -12,3 +12,7 @@ describe('App' , () => {
     expect(component).to.exist;
   });
 });
+
+
+//Write test to check that in letterbag there are 100 letters
+//Write test to check that in letterbag all letters points add up to 187
