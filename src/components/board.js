@@ -26,9 +26,11 @@ class Board extends Component {
   }
 
   renderPieces(x, y) {
-    let { usersLetters, moveLetter } = this.props
+    let { usersLetters, moveLetter, playedLetters } = this.props
     if (!usersLetters || usersLetters.length === 0) return null
-    return usersLetters.map((letter,index) => {
+
+    const letters = [...usersLetters, ...playedLetters]
+    return letters.map((letter,index) => {
       const [letterBlockX, letterBlockY] = letter.position
       if (x === letterBlockX && y === letterBlockY) {
         return <LetterBlock
@@ -161,7 +163,12 @@ function mapStateToProps(state) {
   return {
     usersLetters: user.usersLetters,
     userScore: user.userScore,
-    playedLetters: board.playedLetters
+    playedLetters: board.playedLetters.map(letter => {
+      return {
+        ...letter,
+        playedBy: 'user'
+        }
+    })
   }
 }
 
