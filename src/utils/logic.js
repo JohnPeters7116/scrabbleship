@@ -1,13 +1,7 @@
 import { fetchData } from './requests'
 
-export const composeWord = async (letters) => {
-  const playedLetters = letters.filter(letter => letter.position[1] !== 15)
 
-  if (!playedLetters|| playedLetters.length < 1) {
-    console.log('play some letters')
-    return null
-  }
-  //Make sure at least one letter played
+export const submitWord = async (playedLetters) => {
   //Check to see if letters position either all
   // in same x coordinates or y coordiates. If not
   // then letters not one after other and invalid
@@ -21,7 +15,10 @@ export const composeWord = async (letters) => {
 
   if (!sameRow && !sameColumn) {
     console.log('not in a row or column')
-    return null
+    return {
+      word: 'non-word',
+      score: 0
+    }
   }
 
   //If in same row order by x
@@ -38,8 +35,38 @@ export const composeWord = async (letters) => {
   }, '')
 
   //Check to see if actually word
-  const fetched = await fetchData(word)
-  console.log('word', fetched)
-  const isWord = Object.keys(fetched.authors).length !== 0
-  return isWord
+  const fetchedWord = await fetchData(word)
+  //If word get scoreGet word score
+  const score = fetchedWord === 'non-word'
+    ? 0
+    : calculateWordScore(ordered)
+
+  return {
+    word: fetchedWord,
+    score
+  }
+}
+
+export function observe(receive) {
+  setInterval(() => receive([
+    Math.floor(Math.random() * 8),
+    Math.floor(Math.random() * 8)
+  ]), 500);
+}
+
+export function canDropLetterBlock(toX, toY, coordinates) {
+  console.log(toX)
+  //First move of game must be at the center
+  if (!coordinates[77]){
+    return (toX === 7 & toY === 7);
+  }
+  return true
+}
+
+
+export function calculateWordScore(letterBlocks) {
+   const score = letterBlocks.reduce((a, b) => {
+     return a + b.v
+   }, 0)
+   return score
 }

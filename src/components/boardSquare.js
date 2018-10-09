@@ -59,9 +59,9 @@ export default class BoardSquare extends Component {
         <Square black={black} holder={holder} coordinates={[x, y]}>
           {this.props.children}
         </Square>
-        {isOver && !canDrop && this.renderOverlay('red')}
-        {!isOver && canDrop && this.renderOverlay('yellow')}
-        {isOver && canDrop && this.renderOverlay('green')}
+        {isOver && !canDrop && this.renderOverlay('green')}
+        {/* {!isOver && canDrop && this.renderOverlay('yellow')}
+        {isOver && canDrop && this.renderOverlay('green')} */}
       </div>
     );
   }

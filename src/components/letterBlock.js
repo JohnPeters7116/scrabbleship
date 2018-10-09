@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { ItemTypes } from './Constants';
 import { DragSource } from 'react-dnd';
+import { canDropLetterBlock } from '../utils/logic';
 
 const letterBlockSource = {
   beginDrag(props) {
@@ -14,6 +15,10 @@ const letterBlockSource = {
       coordinateHash[`${letter.position[0]}${letter.position[1]}`] = true
     )
     const result = monitor.getDropResult()
+    console.log('result', result)
+    //check to make sure allowed
+    if (!canDropLetterBlock(result.x, result.y, coordinateHash)) return null
+    //check to make sure no block already there
     if (coordinateHash[`${result.x}${result.y}`]) return null
     let newLetter = {
       ...props.letter,

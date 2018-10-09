@@ -1,5 +1,8 @@
 
-export default function(state = { usersLetters: [] }, action) {
+export default function(state = {
+  usersLetters: [],
+  userScore: 0
+ }, action) {
 
   switch(action.type) {
     case 'MOVE_LETTER':
@@ -18,6 +21,14 @@ export default function(state = { usersLetters: [] }, action) {
     console.log(action.payload)
       return Object.assign({}, state, {
         usersLetters: action.payload
+      })
+
+    case 'INCREASE_USER_SCORE':
+    console.log('user score', action.payload)
+    console.log('state', state)
+    const currentScore = state.userScore
+      return Object.assign({}, state, {
+        userScore: currentScore + action.payload
       })
   }
 

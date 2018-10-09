@@ -4,9 +4,9 @@ import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import BoardSquare from './boardSquare';
 import { connect } from 'react-redux'
-import { moveLetter, newLetters } from '../actions/index'
+import { moveLetter, newLetters, increaseUserScore, addPlayedLetters } from '../actions/index'
 import LetterBag from '../utils/letters'
-import { composeWord } from '../utils/logic'
+import { submitWord } from '../utils/logic'
 import { bindActionCreators } from 'redux'
 
 @DragDropContext(HTML5Backend)
@@ -15,7 +15,7 @@ class Board extends Component {
   constructor(props){
     super(props)
     this.state = {
-      isWord: true
+      word: 'verifying'
     }
   }
 
@@ -80,10 +80,61 @@ class Board extends Component {
     })
   }
 
+  async submitWord() {
+    const {
+      usersLetters,
+      increaseUserScore,
+      addPlayedLetters
+    } = this.props
+    //Make sure at least one letter played
+    if (!usersLetters || usersLetters.length < 1) {
+      console.log('play some letters')
+      return null
+    }
+    //Set state to loading
+    this.setState({
+      loading: true
+    })
+    //Filter to only the letters played on the board
+    const playedLetters = usersLetters.filter(letter => letter.position[1] !== 15)
+    //Check if real word and get its score
+    const wordResponse = await submitWord(playedLetters)
+    console.log('wordResponse', wordResponse)
+    this.setState({
+        word: wordResponse.word
+      },
+      () => {
+        if (wordResponse.word !== 'non-word'){
+          increaseUserScore(wordResponse.score)
+          addPlayedLetters(playedLetters)
+        }
+        setTimeout(() => this.setState({
+          loading: false,
+          word: 'verifying'
+        }), 3000)
+    })
+  }
+
   render() {
-    const { usersLetters} = this.props
+    const { usersLetters, userScore, playedLetters } = this.props
+    const { loading, word } = this.state
+
+    console.log('played letters', playedLetters)
+
     return (
       <div style={styles.container}>
+        {loading &&
+          <div style={styles.loading}>
+            <div style={styles.loadingText}>
+              {word === 'verifying' && 'verifying word...'}
+              {word === 'non-word' && 'not a word'}
+              {
+                word !== 'verifying' && word !== 'non-word'
+                && `acceptable word: "${word}"`
+              }
+            </div>
+          </div>
+        }
         <div style={styles.boardContainer}>
           {this.renderBoard()}
         </div>
@@ -93,14 +144,11 @@ class Board extends Component {
         <div onClick={() => this.newGame()}>
           New Game
         </div>
-        <div onClick={async() => {
-          const isWord = await composeWord(this.props.usersLetters)
-          this.setState({ isWord })
-        }}>
+        <div onClick={() => this.submitWord()}>
           Submit Word
         </div>
         <div>
-          {!this.state.isWord && 'not a word'}
+          {userScore}
         </div>
       </div>
     )
@@ -108,9 +156,12 @@ class Board extends Component {
 }
 
 function mapStateToProps(state) {
-  const { user } = state
+  const { user, board } = state
+  console.log('the state', state)
   return {
-    usersLetters: user.usersLetters
+    usersLetters: user.usersLetters,
+    userScore: user.userScore,
+    playedLetters: board.playedLetters
   }
 }
 
@@ -118,6 +169,8 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     newLetters,
     moveLetter,
+    increaseUserScore,
+    addPlayedLetters
   }, dispatch)
 }
 
@@ -147,5 +200,25 @@ const styles = {
     display: 'flex',
     flexWrap: 'wrap',
     backgroundColor: 'brown'
+  },
+  loading: {
+    position: 'fixed',
+    display: 'flex',
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    left: 0,
+    top: 0,
+    backgroundColor: 'rgba(51,51,51,0.7)',
+    zIndex: 3,
+  },
+  loadingText: {
+    display: 'block',
+    textAlign: 'center',
+    color: 'white',
+    backgroundColor: 'black',
+    borderRadius: 4,
+    padding: 15
   }
 };
