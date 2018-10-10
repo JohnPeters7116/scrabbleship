@@ -6,18 +6,17 @@ import { canDropLetterBlock } from '../utils/logic';
 
 const letterBlockSource = {
   beginDrag(props) {
-    // console.log('drag', props)
     return {};
   },
   endDrag(props, monitor, component) {
     let coordinateHash = {}
     props.letters.forEach(letter =>
-      coordinateHash[`${letter.position[0]}${letter.position[1]}`] = true
+      coordinateHash[`${letter.position[0]}-${letter.position[1]}`] = true
     )
     const result = monitor.getDropResult()
-    console.log('result', result)
     //check to make sure allowed
-    if (!canDropLetterBlock(result.x, result.y, coordinateHash)) return null
+    console.log('endDrag', coordinateHash, props.letters)
+    if (!canDropLetterBlock(result.x, result.y, coordinateHash, props.letters)) return null
     //check to make sure no block already there
     if (coordinateHash[`${result.x}${result.y}`]) return null
     let newLetter = {

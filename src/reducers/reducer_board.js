@@ -1,5 +1,8 @@
+import LetterBag from "../utils/letters";
+
 export default function(state = {
   playedLetters: [],
+  letterBag: new LetterBag()
  }, action) {
 
   switch(action.type) {
@@ -11,6 +14,12 @@ export default function(state = {
       return Object.assign({}, state, {
         playedLetters
       })
+
+    case 'NEW_LETTERBAG':
+     return Object.assign({}, state, {
+       letterBag: action.payload
+     })
+
   }
 
   return state

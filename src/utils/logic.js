@@ -47,26 +47,39 @@ export const submitWord = async (playedLetters) => {
   }
 }
 
-export function observe(receive) {
-  setInterval(() => receive([
-    Math.floor(Math.random() * 8),
-    Math.floor(Math.random() * 8)
-  ]), 500);
+export function calculateWordScore(letterBlocks) {
+  const score = letterBlocks.reduce((a, b) => {
+    return a + b.v
+  }, 0)
+  return score
 }
-
-export function canDropLetterBlock(toX, toY, coordinates) {
-  console.log(toX)
+export function canDropLetterBlock(toX, toY, coordinates, letters) {
+  // console.log(coordinates)
+  // console.log(Object.keys(coordinates))
   //First move of game must be at the center
-  if (!coordinates[77]){
+  if (!coordinates['7-7']){
     return (toX === 7 & toY === 7);
   }
-  return true
+  const playable = playableSquares(letters)
+  //Next moves must be next to already played letters
+  if (playable[`${toX}-${toY}`]){
+    return true
+  }
+  return false
 }
 
-
-export function calculateWordScore(letterBlocks) {
-   const score = letterBlocks.reduce((a, b) => {
-     return a + b.v
-   }, 0)
-   return score
+export function playableSquares(letters) {
+  if (!letters) return null
+  const perimeterHash = {}
+  letters.forEach(letter => {
+    if (letter.position[1] === 15) return null
+    perimeterHash[`${letter.position[0]-1}-${letter.position[1]}`] = true
+    perimeterHash[`${letter.position[0]+1}-${letter.position[1]}`] = true
+    perimeterHash[`${letter.position[0]}-${letter.position[1]-1}`] = true
+    perimeterHash[`${letter.position[0]}-${letter.position[1]+1}`] = true
+    }
+  )
+  if (Object.keys(perimeterHash).length === 0) return {'7-7': true}
+  return perimeterHash
 }
+

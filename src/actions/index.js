@@ -27,3 +27,10 @@ export function addPlayedLetters(word) {
     payload: word
   }
 }
+
+export function newLetterBag(letterBag) {
+  return {
+    type: 'NEW_LETTERBAG',
+    payload: letterBag
+  }
+}

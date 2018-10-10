@@ -4,9 +4,8 @@ import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import BoardSquare from './boardSquare';
 import { connect } from 'react-redux'
-import { moveLetter, newLetters, increaseUserScore, addPlayedLetters } from '../actions/index'
-import LetterBag from '../utils/letters'
-import { submitWord } from '../utils/logic'
+import { moveLetter, newLetters, increaseUserScore, addPlayedLetters, newLetterBag } from '../actions/index'
+import { submitWord, playableSquares } from '../utils/logic'
 import { bindActionCreators } from 'redux'
 
 @DragDropContext(HTML5Backend)
@@ -20,9 +19,35 @@ class Board extends Component {
   }
 
   newGame() {
-    const bag = new LetterBag()
-    const letters = bag.dealLetters(7)
-    this.props.newLetters(letters)
+    const {
+      letterBag,
+      newLetterBag,
+      newLetters
+    } = this.props
+    const letters = letterBag.dealLetters(7)
+    newLetters(letters)
+    newLetterBag(letterBag)
+  }
+
+  getNewLetters() {
+      const {
+        letterBag,
+        newLetterBag,
+        newLetters,
+        usersLetters
+      } = this.props
+       //Filter to only the letters not played on the board
+      const nonPlayedLetters = usersLetters.filter(letter => letter.position[1] === 15)
+
+      const letters = letterBag.dealLetters(7 - nonPlayedLetters.length)
+      const newUserLetters = [...letters, ...nonPlayedLetters].map((letter, index) => {
+        return {
+          ...letter,
+          position: [index, 15]
+        }
+      })
+      newLetters(newUserLetters)
+      newLetterBag(letterBag)
   }
 
   renderPieces(x, y) {
@@ -37,12 +62,12 @@ class Board extends Component {
           letter={letter}
           key={index}
           action={moveLetter}
-          letters={usersLetters}/>;
+          letters={letters}/>;
       }
     })
   }
 
-  renderBoard() {
+  renderBoard(letters) {
     const squares = []
     for (let i = 0; i < 225; i++) {
       squares.push(i)
@@ -54,7 +79,7 @@ class Board extends Component {
       return(
         <div key={i}
           style={{ width: '6.66%', height: '6.66%'}}>
-          <BoardSquare x={x} y={y}>
+          <BoardSquare x={x} y={y} letters={letters}>
             {this.renderPieces(x, y)}
           </BoardSquare>
         </div>
@@ -62,7 +87,7 @@ class Board extends Component {
     })
   }
 
-  renderHolderSquares() {
+  renderHolderSquares(letters) {
     const holder = []
     for (let i = 225; i < 240; i++) {
       holder.push(i)
@@ -74,7 +99,7 @@ class Board extends Component {
       return(
         <div key={i}
            style={{ width: '6.66%', height: '100%'}}>
-          <BoardSquare x={x} y={y} holder>
+          <BoardSquare x={x} y={y} holder letters={letters}>
             {this.renderPieces(x, y)}
           </BoardSquare>
         </div>
@@ -101,7 +126,6 @@ class Board extends Component {
     const playedLetters = usersLetters.filter(letter => letter.position[1] !== 15)
     //Check if real word and get its score
     const wordResponse = await submitWord(playedLetters)
-    console.log('wordResponse', wordResponse)
     this.setState({
         word: wordResponse.word
       },
@@ -109,6 +133,7 @@ class Board extends Component {
         if (wordResponse.word !== 'non-word'){
           increaseUserScore(wordResponse.score)
           addPlayedLetters(playedLetters)
+          this.getNewLetters()
         }
         setTimeout(() => this.setState({
           loading: false,
@@ -121,8 +146,7 @@ class Board extends Component {
     const { usersLetters, userScore, playedLetters } = this.props
     const { loading, word } = this.state
 
-    console.log('played letters', playedLetters)
-
+    const letters = [...usersLetters, ...playedLetters]
     return (
       <div style={styles.container}>
         {loading &&
@@ -138,10 +162,10 @@ class Board extends Component {
           </div>
         }
         <div style={styles.boardContainer}>
-          {this.renderBoard()}
+          {this.renderBoard(letters)}
         </div>
           <div style={styles.holderContainer}>
-          {this.renderHolderSquares()}
+          {this.renderHolderSquares(letters)}
         </div>
         <div onClick={() => this.newGame()}>
           New Game
@@ -159,10 +183,10 @@ class Board extends Component {
 
 function mapStateToProps(state) {
   const { user, board } = state
-  console.log('the state', state)
   return {
     usersLetters: user.usersLetters,
     userScore: user.userScore,
+    letterBag: board.letterBag,
     playedLetters: board.playedLetters.map(letter => {
       return {
         ...letter,
@@ -175,9 +199,10 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     newLetters,
+    newLetterBag,
     moveLetter,
     increaseUserScore,
-    addPlayedLetters
+    addPlayedLetters,
   }, dispatch)
 }
 

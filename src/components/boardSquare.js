@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Square from './square';
-// import { canMoveKnight, moveKnight } from './Game';
 import { ItemTypes } from './constants';
 import { DropTarget } from 'react-dnd';
 import { changePosition } from '../actions/index'
+import { canDropLetterBlock, playableSquares } from '../utils/logic';
 import { connect } from 'react-redux'
 
 const squareTarget = {
@@ -49,19 +49,25 @@ export default class BoardSquare extends Component {
       isOver,
       dropResult,
       holder,
-      canDrop,
+      letters,
+      playable
     } = this.props;
     const black = (x + y) % 2 === 1;
-    // console.log("TARGET", dropResult)
+
+    let coordinateHash = {}
+      letters.forEach(letter =>
+        coordinateHash[`${letter.position[0]}-${letter.position[1]}`] = letter
+      )
+
+    const canDrop = canDropLetterBlock(x, y, coordinateHash, letters)
 
     return connectDropTarget(
       <div style={styles.container}>
         <Square black={black} holder={holder} coordinates={[x, y]}>
           {this.props.children}
         </Square>
-        {isOver && !canDrop && this.renderOverlay('green')}
-        {/* {!isOver && canDrop && this.renderOverlay('yellow')}
-        {isOver && canDrop && this.renderOverlay('green')} */}
+        {isOver && !canDrop && this.renderOverlay('red')}
+        {isOver && canDrop && this.renderOverlay('green')}
       </div>
     );
   }
